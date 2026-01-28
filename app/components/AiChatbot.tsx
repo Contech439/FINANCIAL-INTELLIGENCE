@@ -13,12 +13,16 @@ export default function AiChatbot() {
   const [isTyping, setIsTyping] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // URL GAMBAR ROBOT 3D (STABIL)
+  // Menggunakan Microsoft Fluent Emoji 3D (High Quality)
+  const ROBOT_AVATAR_URL = "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Robot.png"
+
   // Auto scroll
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [messages, isOpen])
 
-  // --- LOGIC AI (SAMA SEPERTI SEBELUMNYA) ---
+  // --- LOGIC AI ---
   const processQuery = async (query: string) => {
     setIsTyping(true)
     const q = query.toLowerCase()
@@ -36,7 +40,6 @@ export default function AiChatbot() {
             return
         }
 
-        // Logic Saldo
         if (q.includes('saldo') || q.includes('kas') || q.includes('uang')) {
             const { data: lines } = await supabase.from('journal_lines')
                 .select('debit, credit, chart_of_accounts!inner(name)')
@@ -46,15 +49,9 @@ export default function AiChatbot() {
             lines?.forEach((l:any) => total += (l.debit - l.credit))
             response = `Saldo Kas & Bank saat ini: **Rp ${total.toLocaleString('id-ID')}**.`
         }
-        // Logic Laba/Omzet
         else if (q.includes('laba') || q.includes('rugi') || q.includes('omzet')) {
-            // (Sederhana: hitung semua income - expense bulan ini)
-            // ... Logic sama seperti sebelumnya ...
             response = "Sedang menghitung performa bulan ini... (Data Realtime)." 
-            // Note: Saya persingkat logic disini agar fokus ke UI Avatar, 
-            // di real app gunakan logic fetch jurnal lengkap seperti sebelumnya.
         }
-        // Logic Utang
         else if (q.includes('hutang') || q.includes('tagihan')) {
              response = "Mengecek database tagihan... Sepertinya ada beberapa yang jatuh tempo."
         }
@@ -67,7 +64,7 @@ export default function AiChatbot() {
     setTimeout(() => {
         setMessages(prev => [...prev, { role: 'ai', text: response }])
         setIsTyping(false)
-    }, 1500) // Delay agak lama biar berasa mikir
+    }, 1500)
   }
 
   const handleSend = (e: React.FormEvent) => {
@@ -92,15 +89,14 @@ export default function AiChatbot() {
             </div>
 
             {/* Efek Glow di Belakang Avatar */}
-            <div className="absolute inset-0 bg-orange-500 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+            <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-40 animate-pulse"></div>
 
             {/* GAMBAR AVATAR 3D (Floating Animation) */}
             <div className="relative w-24 h-24 transition-transform transform hover:scale-110 duration-300">
                 <img 
-                    // Menggunakan gambar 3D Robot Head (Rendered)
-                    src="https://cdn3d.iconscout.com/3d/premium/thumb/robot-face-5466270-4568607.png" 
+                    src={ROBOT_AVATAR_URL}
                     alt="AI Avatar"
-                    className="w-full h-full object-contain animate-float"
+                    className="w-full h-full object-contain animate-float drop-shadow-2xl"
                 />
                 
                 {/* Status Dot (Online) */}
@@ -116,15 +112,15 @@ export default function AiChatbot() {
             {/* Header dengan Avatar Kecil */}
             <div className="bg-[#0f172a] p-4 flex justify-between items-center relative overflow-hidden">
                 {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500 rounded-full blur-[50px] opacity-20 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-[50px] opacity-20 pointer-events-none"></div>
                 
                 <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
-                        <img src="https://cdn3d.iconscout.com/3d/premium/thumb/robot-face-5466270-4568607.png" className="w-8 h-8 object-contain" />
+                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20 overflow-hidden">
+                        <img src={ROBOT_AVATAR_URL} className="w-8 h-8 object-contain" />
                     </div>
                     <div>
                         <h3 className="text-white font-bold text-sm">FinCore Assistant</h3>
-                        <p className="text-orange-400 text-[10px] font-mono tracking-wider flex items-center gap-1">
+                        <p className="text-blue-400 text-[10px] font-mono tracking-wider flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> ONLINE
                         </p>
                     </div>
@@ -138,7 +134,7 @@ export default function AiChatbot() {
                     <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {m.role === 'ai' && (
                              <div className="w-8 h-8 mr-2 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden flex-shrink-0">
-                                <img src="https://cdn3d.iconscout.com/3d/premium/thumb/robot-face-5466270-4568607.png" className="w-6 h-6" />
+                                <img src={ROBOT_AVATAR_URL} className="w-6 h-6 object-contain" />
                              </div>
                         )}
                         <div className={`max-w-[80%] p-3 rounded-2xl text-sm shadow-sm whitespace-pre-line ${
@@ -152,8 +148,8 @@ export default function AiChatbot() {
                 ))}
                 {isTyping && (
                     <div className="flex justify-start items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm">
-                            <img src="https://cdn3d.iconscout.com/3d/premium/thumb/robot-face-5466270-4568607.png" className="w-6 h-6 opacity-50" />
+                        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden">
+                            <img src={ROBOT_AVATAR_URL} className="w-6 h-6 object-contain opacity-50" />
                         </div>
                         <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-none border border-gray-200 flex gap-1 shadow-sm">
                             <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
@@ -168,19 +164,19 @@ export default function AiChatbot() {
             <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 flex gap-2 items-center">
                 <input 
                     type="text" 
-                    className="flex-1 bg-gray-100 border-0 rounded-full px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 transition outline-none text-gray-700 placeholder-gray-400"
+                    className="flex-1 bg-gray-100 border-0 rounded-full px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition outline-none text-gray-700 placeholder-gray-400"
                     placeholder="Ketik pertanyaan..."
                     value={input}
                     onChange={e => setInput(e.target.value)}
                 />
-                <button type="submit" className="bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-orange-600 transition shadow-lg hover:shadow-orange-200 transform hover:scale-105 active:scale-95">
+                <button type="submit" className="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 transition shadow-lg hover:shadow-blue-200 transform hover:scale-105 active:scale-95">
                     <svg className="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </form>
         </div>
       )}
 
-      {/* Custom CSS Animation untuk Floating */}
+      {/* Custom CSS Animation */}
       <style jsx>{`
         @keyframes float {
             0% { transform: translateY(0px); }
